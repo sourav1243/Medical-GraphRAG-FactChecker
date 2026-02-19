@@ -1,0 +1,142 @@
+[
+  {
+    "id": "G001",
+    "claim": "Antibiotics are effective against viral infections like the common cold.",
+    "language": "en",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "Antibiotics only work against bacterial infections, not viral ones."
+  },
+  {
+    "id": "G002",
+    "claim": "Regular exercise reduces the risk of cardiovascular disease.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Extensive peer-reviewed literature supports this claim."
+  },
+  {
+    "id": "G003",
+    "claim": "गर्म पानी पीने से कोरोना वायरस ठीक हो जाता है।",
+    "language": "hi",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "No evidence that hot water consumption cures COVID-19."
+  },
+  {
+    "id": "G004",
+    "claim": "Trinken von warmem Wasser heilt COVID-19.",
+    "language": "de",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "German version of the same hot water myth."
+  },
+  {
+    "id": "G005",
+    "claim": "Vaccination reduces the risk of severe disease and hospitalization.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Strongly supported by clinical trial data."
+  },
+  {
+    "id": "G006",
+    "claim": "மஞ்சள் பால் குடிப்பது புற்றுநோயை குணப்படுத்தும்.",
+    "language": "ta",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "Turmeric milk has no proven cancer-curing properties."
+  },
+  {
+    "id": "G007",
+    "claim": "Ibuprofen treats inflammation and pain.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Ibuprofen is an NSAID proven to treat inflammation and pain."
+  },
+  {
+    "id": "G008",
+    "claim": "Insulin is used to treat Type 1 diabetes.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Standard of care for T1DM is insulin replacement therapy."
+  },
+  {
+    "id": "G009",
+    "claim": "Drinking bleach cures all diseases.",
+    "language": "en",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "Bleach is toxic and has no curative medical properties."
+  },
+  {
+    "id": "G010",
+    "claim": "तुलसी के पत्ते खाने से मधुमेह नियंत्रित होता है।",
+    "language": "hi",
+    "ground_truth_verdict": "UNVERIFIABLE",
+    "ground_truth_explanation": "Limited and inconclusive evidence for tulsi in diabetes management."
+  },
+  {
+    "id": "G011",
+    "claim": "Vitamin C prevents the common cold.",
+    "language": "en",
+    "ground_truth_verdict": "UNVERIFIABLE",
+    "ground_truth_explanation": "Evidence is mixed; some studies show minimal benefit."
+  },
+  {
+    "id": "G012",
+    "claim": "Aspirin reduces the risk of heart attack in high-risk patients.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Low-dose aspirin is recommended for secondary prevention."
+  },
+  {
+    "id": "G013",
+    "claim": "Telugu: వెచ్చని నీటిని తాగడం కరోనావైరస్‌ను నయం చేస్తుంది.",
+    "language": "te",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "No scientific evidence supports this claim."
+  },
+  {
+    "id": "G014",
+    "claim": "Statins effectively lower cholesterol levels.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Statins are proven to reduce LDL cholesterol and CV risk."
+  },
+  {
+    "id": "G015",
+    "claim": "Drinking lemon juice cures diabetes.",
+    "language": "en",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "Lemon juice has no proven effect on diabetes cure."
+  },
+  {
+    "id": "G016",
+    "claim": "COVID-19 vaccines cause autism.",
+    "language": "en",
+    "ground_truth_verdict": "CONTRADICTED",
+    "ground_truth_explanation": "No scientific evidence supports this claim; the original study was fraudulent."
+  },
+  {
+    "id": "G017",
+    "claim": "Chemotherapy is the standard treatment for most cancers.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Chemotherapy remains a cornerstone of cancer treatment."
+  },
+  {
+    "id": "G018",
+    "claim": "Meditation improves mental health and reduces stress.",
+    "language": "en",
+    "ground_truth_verdict": "SUPPORTED",
+    "ground_truth_explanation": "Multiple studies demonstrate benefits for stress and anxiety."
+  },
+  {
+    "id": "G019",
+    "claim": "German: Knoblauch heilt Herzkrankheiten.",
+    "language": "de",
+    "ground_truth_verdict": "UNVERIFIABLE",
+    "ground_truth_explanation": "Garlic may have modest cardiovascular benefits but not curative properties."
+  },
+  {
+    "id": "G020",
+    "claim": "Tamil: பூண்டு சாப்பிடுவதால் இதய நோய் வராது.",
+    "language": "ta",
+    "ground_truth_verdict": "UNVERIFIABLE",
+    "ground_truth_explanation": "Insufficient evidence for garlic preventing heart disease."
+  }
+]
