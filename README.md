@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![Neo4j](https://img.shields.io/badge/Neo4j-AuraDB-green.svg)](https://neo4j.com/cloud/aura/)
 [![OpenRouter](https://img.shields.io/badge/OpenRouter-Gemini-orange.svg)](https://openrouter.ai/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 **An AI-powered multilingual medical fact-checking system that uses Retrieval-Augmented Generation (RAG) and Knowledge Graphs to verify health claims against peer-reviewed medical literature.**
 
@@ -156,7 +156,7 @@ Medical-GraphRAG-FactChecker/
 │   └── fact_check_results.json    # Results output
 ├── .env.example                    # Environment template
 ├── .gitignore                      # Git ignore rules
-├── LICENSE                         # MIT License
+├── LICENSE                         # Proprietary - All Rights Reserved
 ├── README.md                       # This file
 ├── requirements.txt                # Python dependencies
 ├── pyproject.toml                 # Project metadata
@@ -366,7 +366,7 @@ isort src/ tests/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary and confidential. All rights reserved. See the [LICENSE](LICENSE) file for details.
 
 ---
 
