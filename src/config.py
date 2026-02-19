@@ -1,45 +1,82 @@
+# Copyright 2025 Sourav Kumar Sharma
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Configuration Module
 
 Manages environment variables and configuration settings for the application.
+Uses pydantic-settings for robust configuration management with validation.
 """
 
-import os
 from pathlib import Path
-from dotenv import load_dotenv
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+class Settings(BaseSettings):
+    """Application settings with pydantic validation."""
 
-load_dotenv()
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
+
+    neo4j_uri: str = Field(..., description="Neo4j AuraDB connection URI")
+    neo4j_username: str = Field(default="neo4j", description="Neo4j username")
+    neo4j_password: str = Field(..., description="Neo4j password")
+
+    openrouter_api_key: str = Field(..., description="OpenRouter API key")
+    openrouter_model: str = Field(
+        default="google/gemini-2.0-flash-001",
+        description="OpenRouter model name",
+    )
+    openrouter_base_url: str = Field(
+        default="https://openrouter.ai/api/v1",
+        description="OpenRouter API base URL",
+    )
+
+    embedding_model: str = Field(
+        default="BAAI/bge-m3",
+        description="Embedding model name",
+    )
+    embedding_dim: int = Field(default=1024, description="Embedding dimension")
+
+    pubmed_sample_size: int = Field(default=200, description="PubMed sample size")
+    top_k_retrieval: int = Field(default=8, description="Top-k for retrieval")
+    similarity_threshold_match: float = Field(
+        default=0.85, description="Threshold for strong match"
+    )
+    similarity_threshold_weak: float = Field(
+        default=0.75, description="Threshold for weak match"
+    )
+
+    @property
+    def base_dir(self) -> Path:
+        """Get the base directory of the project."""
+        return Path(__file__).resolve().parent.parent
+
+    @property
+    def data_dir(self) -> Path:
+        """Get the data directory."""
+        return self.base_dir / "data"
+
+    @property
+    def embeddings_dir(self) -> Path:
+        """Get the embeddings directory."""
+        return self.base_dir / "embeddings"
 
 
-class Config:
-    """Application configuration."""
-    
-    NEO4J_URI = os.getenv("NEO4J_URI", "")
-    NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "")
-    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
-    
-    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-    
-    EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-    MAX_RECORDS = 50
-    TOP_K_RESULTS = 5
-    
-    DATA_DIR = BASE_DIR / "data"
-    EMBEDDINGS_DIR = BASE_DIR / "embeddings"
-    
-    @classmethod
-    def validate(cls):
-        """Validate required configuration."""
-        required = [
-            cls.NEO4J_URI,
-            cls.NEO4J_USERNAME, 
-            cls.NEO4J_PASSWORD,
-            cls.OPENROUTER_API_KEY
-        ]
-        return all(required)
-
-
-config = Config()
+settings = Settings()

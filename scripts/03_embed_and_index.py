@@ -1,3 +1,17 @@
+# Copyright 2025 Sourav Kumar Sharma
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Embedding Generation Module
 
@@ -6,102 +20,81 @@ sentence-transformers, enabling semantic similarity search.
 """
 
 import json
+from pathlib import Path
+
 import numpy as np
-import os
 from sentence_transformers import SentenceTransformer
 
+from src.config import settings
+from src.logger import get_logger
 
-MODEL_NAME = "all-MiniLM-L6-v2"
+logger = get_logger(__name__)
 
 
 def generate_embeddings(
-    data_path: str = "data/pubmedqa_clean.json",
-    output_path: str = "embeddings/pubmed_embeddings.npy"
+    data_path: str | None = None,
+    output_path: str | None = None,
 ) -> np.ndarray:
     """
     Generate embeddings for PubMedQA data.
-    
+
     Args:
         data_path: Path to cleaned PubMedQA JSON
         output_path: Path to save embeddings
-    
+
     Returns:
         numpy.ndarray: Embedding matrix
     """
-    print(f"Loading embedding model: {MODEL_NAME}...")
-    model = SentenceTransformer(MODEL_NAME)
-    
-    print(f"Loading data from {data_path}...")
-    with open(data_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
+    if data_path is None:
+        data_path = str(settings.data_dir / "pubmedqa_clean.json")
+    if output_path is None:
+        output_path = str(settings.embeddings_dir / "pubmed_embeddings.npy")
+
+    logger.info("Loading embedding model: %s", settings.embedding_model)
+
+    try:
+        model = SentenceTransformer(settings.embedding_model)
+    except Exception as e:
+        logger.error("Failed to load embedding model: %s", e, exc_info=True)
+        raise
+
+    logger.info("Loading data from %s...", data_path)
+    try:
+        with open(data_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        logger.error("Data file not found at %s", data_path)
+        raise
+    except json.JSONDecodeError as e:
+        logger.error("Invalid JSON in data file: %s", e)
+        raise
+
     contexts = [item["context"] for item in data]
-    
-    print(f"Generating embeddings for {len(contexts)} documents...")
-    embeddings = model.encode(
-        contexts,
-        batch_size=32,
-        show_progress_bar=True,
-        normalize_embeddings=True
+
+    logger.info(
+        "Generating embeddings for %d documents (dimension: %d)...",
+        len(contexts),
+        settings.embedding_dim,
     )
-    
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    try:
+        embeddings = model.encode(
+            contexts,
+            batch_size=32,
+            show_progress_bar=True,
+            normalize_embeddings=True,
+        )
+    except Exception as e:
+        logger.error("Failed to generate embeddings: %s", e, exc_info=True)
+        raise
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     np.save(output_path, embeddings)
-    
-    print(f"Saved embeddings to {output_path}")
-    print(f"Embedding shape: {embeddings.shape}")
-    
+
+    logger.info("Saved embeddings to %s", output_path)
+    logger.info("Embedding shape: %s", embeddings.shape)
+
     return embeddings
-
-
-def cosine_similarity(query_embedding: np.ndarray, corpus_embeddings: np.ndarray) -> np.ndarray:
-    """
-    Compute cosine similarity between query and corpus embeddings.
-    
-    Args:
-        query_embedding: Query vector (D,)
-        corpus_embeddings: Corpus matrix (N, D)
-    
-    Returns:
-        numpy.ndarray: Similarity scores (N,)
-    """
-    return np.dot(corpus_embeddings, query_embedding)
-
-
-def search_similar(
-    query: str,
-    embeddings: np.ndarray,
-    data: list,
-    model,
-    top_k: int = 5
-) -> list:
-    """
-    Search for similar documents using cosine similarity.
-    
-    Args:
-        query: Query text
-        embeddings: Embedding matrix
-        data: Original data list
-        model: Sentence transformer model
-        top_k: Number of results to return
-    
-    Returns:
-        list: Top-k similar documents with scores
-    """
-    query_embedding = model.encode(query, normalize_embeddings=True)
-    scores = cosine_similarity(query_embedding, embeddings)
-    top_indices = np.argsort(scores)[::-1][:top_k]
-    
-    results = []
-    for idx in top_indices:
-        results.append({
-            "score": float(scores[idx]),
-            "question": data[idx]["question"],
-            "context": data[idx]["context"][:300] + "...",
-            "answer": data[idx]["answer"]
-        })
-    
-    return results
 
 
 if __name__ == "__main__":
