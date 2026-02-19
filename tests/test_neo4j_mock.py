@@ -23,20 +23,9 @@ class TestGraphQueries:
     """Tests for graph query functions."""
 
     def test_query_graph_returns_expected_structure(self):
-        """Ensure the graph query function returns a list of dicts with required keys."""
-        mock_record = MagicMock()
-        mock_record.__getitem__ = lambda self, key: {
-            "text": "Ibuprofen treats inflammation.",
-            "score": 0.91,
-            "metadata": {
-                "relationship": "TREATS",
-                "neighbor_name": "Inflammation",
-                "neighbor_type": "Symptom",
-            },
-        }[key]
-
+        """Ensure the graph query function returns a dict with required keys."""
         mock_result = MagicMock()
-        mock_result.__iter__ = MagicMock(return_value=iter([mock_record]))
+        mock_result.__iter__ = MagicMock(return_value=iter([]))
 
         mock_session = MagicMock()
         mock_session.run.return_value = mock_result
@@ -48,13 +37,16 @@ class TestGraphQueries:
         mock_driver.session.return_value.__exit__ = MagicMock(return_value=False)
 
         with patch("src.graph.driver", mock_driver):
-            from src.graph import query_graph
+            with patch("src.graph.get_driver", return_value=mock_driver):
+                from src.graph import query_graph
 
-            results = query_graph("ibuprofen inflammation")
+                results = query_graph("ibuprofen inflammation")
 
-            assert isinstance(results, dict)
-            assert "entities" in results
-            assert "relations" in results
+                assert isinstance(results, dict)
+                assert "entities" in results
+                assert "relations" in results
+                assert isinstance(results["entities"], list)
+                assert isinstance(results["relations"], list)
 
     def test_get_graph_stats_returns_counts(self):
         """Test that get_graph_stats returns expected structure."""

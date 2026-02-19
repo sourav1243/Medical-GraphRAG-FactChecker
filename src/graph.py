@@ -21,6 +21,7 @@ Provides Neo4j knowledge graph query functionality for the fact-checking system.
 from typing import Any
 
 from neo4j import GraphDatabase
+from neo4j import Driver
 from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from src.config import settings
@@ -28,10 +29,10 @@ from src.logger import get_logger
 
 logger = get_logger(__name__)
 
-driver: GraphDatabase.driver | None = None
+driver: Driver | None = None
 
 
-def get_driver() -> GraphDatabase.driver:
+def get_driver() -> Driver:
     """
     Get or create a Neo4j driver instance.
 
@@ -79,7 +80,7 @@ def close_driver() -> None:
         logger.info("Neo4j connection closed")
 
 
-def query_graph(query_text: str) -> list[dict[str, Any]]:
+def query_graph(query_text: str) -> dict[str, Any]:
     """
     Query the knowledge graph for entities and relationships.
 
@@ -139,13 +140,13 @@ def get_graph_stats() -> dict[str, int]:
 
     with neo4j_driver.session() as session:
         result = session.run("MATCH (n:Chunk) RETURN count(n) as c")
-        chunk_count = result.single()["c"]
+        chunk_count = result.single()["c"] if result.single() else 0
 
         result = session.run("MATCH (n:Entity) RETURN count(n) as c")
-        entity_count = result.single()["c"]
+        entity_count = result.single()["c"] if result.single() else 0
 
         result = session.run("MATCH ()-[r:RELATES]->() RETURN count(r) as c")
-        rel_count = result.single()["c"]
+        rel_count = result.single()["c"] if result.single() else 0
 
     return {
         "chunks": chunk_count,
