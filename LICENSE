@@ -1,0 +1,38 @@
+# PROPRIETARY LICENSE
+# ALL RIGHTS RESERVED
+
+Copyright (c) 2026 Sourav Kumar Sharma
+
+## RESTRICTIONS
+
+This software and its documentation are proprietary and confidential. 
+Unauthorized copying, distribution, modification, or use of this project, 
+via any medium, is strictly prohibited.
+
+### Specifically Prohibited:
+1. **NO COPYING** - Copying any part of this code for any purpose is prohibited
+2. **NO DERIVATIVE WORKS** - Creating modifications, adaptations, or derivative works is prohibited  
+3. **NO COMMERCIAL USE** - Using this project for commercial purposes is prohibited
+4. **NO REUSE** - Reusing any code, architecture, or concepts is prohibited
+
+### Attribution Required:
+Any use of this project for demonstration purposes MUST include:
+- Full credit to: **Sourav Kumar Sharma**
+- Link to original repository: **https://github.com/sourav1243/Medical-GraphRAG-FactChecker**
+- Statement: *"This project was developed by Sourav Kumar Sharma"*
+
+## LIMITATION OF LIABILITY
+
+THIS PROJECT IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. THE AUTHOR 
+SHALL NOT BE LIABLE FOR ANY CLAIMS, DAMAGES, OR OTHER LIABILITIES ARISING 
+FROM OR RELATED TO THE PROJECT.
+
+## CONTACT
+
+For permission requests, contact: sourav@example.com
+
+---
+
+**NOTE: This license is intentionally restrictive to protect the developer's work. 
+If you are an employer evaluating this project for hiring purposes, please 
+contact the developer for usage permissions.**
