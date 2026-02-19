@@ -2,14 +2,25 @@
 
 <div align="center">
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Tests](https://github.com/sourav1243/Medical-GraphRAG-FactChecker/actions/workflows/test.yml/badge.svg)](https://github.com/sourav1243/Medical-GraphRAG-FactChecker/actions/workflows/test.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Neo4j](https://img.shields.io/badge/Neo4j-AuraDB-green.svg)](https://neo4j.com/cloud/aura/)
-[![OpenRouter](https://img.shields.io/badge/OpenRouter-Gemini-orange.svg)](https://openrouter.ai/)
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+[![OpenRouter](https://img.shields.io/badge/LLM-OpenRouter-orange.svg)](https://openrouter.ai/)
 
 **An AI-powered multilingual medical fact-checking system that uses Retrieval-Augmented Generation (RAG) and Knowledge Graphs to verify health claims against peer-reviewed medical literature.**
 
 </div>
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/sourav1243/Medical-GraphRAG-FactChecker.git && cd Medical-GraphRAG-FactChecker
+cp .env.example .env && nano .env   # Add your Neo4j + OpenRouter credentials
+docker compose up --build           # Starts Neo4j + runs the pipeline
+```
 
 ---
 
@@ -30,8 +41,8 @@
   - [Step 3: Generate Embeddings](#step-3-generate-embeddings)
   - [Step 4: Build Knowledge Graph](#step-4-build-knowledge-graph)
   - [Step 5: Run Fact-Checking](#step-5-run-fact-checking)
-- [API Configuration](#api-configuration)
-- [Sample Results](#sample-results)
+- [Docker Usage](#docker-usage)
+- [Evaluation](#evaluation)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
@@ -66,40 +77,16 @@ Medical misinformation, especially in regional languages, poses a significant th
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        MEDICAL GRAPHRAG FACT-CHECKER                       │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────────────┐
-│   Data Sources   │     │   Embedding &    │     │   Knowledge Graph        │
-│                  │     │   Vector Store   │     │   (Neo4j AuraDB)        │
-├──────────────────┤     ├──────────────────┤     ├──────────────────────────┤
-│ • PubMedQA       │────▶│ • all-MiniLM-L6  │     │ • Entity Nodes           │
-│ • Medical Claims │     │ • Vector Index   │     │   - Disease (132)        │
-│ • Research Paper │     │ • Cosine Sim    │     │   - Drug (22)           │
-└──────────────────┘     └──────────────────┘     │   - Symptom (77)        │
-                                                     │   - Treatment (84)      │
-                                                     ├──────────────────────────┤
-                                                     │ • Relationships         │
-                                                     │   - TREATS              │
-┌──────────────────┐     ┌──────────────────┐     │   - CAUSES              │
-│  LLM Processing  │     │  Fact-Check      │     │   - PREVENTS            │
-│                  │     │  Pipeline        │     └──────────────────────────┘
-├──────────────────┤     ├──────────────────┤              ▲
-│ • Gemini Flash   │────▶│ • Translation    │              │
-│ • OpenRouter API │     │ • Context Build │              │
-│ • JSON Parsing   │     │ • Verdict Gen   │              │
-└──────────────────┘     └──────────────────┘              │
-                             │                               │
-                             ▼                               │
-                    ┌────────────────┐                      │
-                    │  Final Output   │──────────────────────┘
-                    ├────────────────┤
-                    │ • VERDICT       │
-                    │ • CONFIDENCE    │
-                    │ • EXPLANATION   │
-                    └────────────────┘
+```mermaid
+flowchart LR
+    A[Regional Medical Claim<br>Hindi / German / Tamil] --> B[BAAI/bge-m3<br>Multilingual Embedding]
+    B --> C{Hybrid Retrieval}
+    C -->|Vector Search| D[PubMedQA<br>Embedding Index]
+    C -->|Graph Traversal| E[Neo4j AuraDB<br>Knowledge Graph]
+    D --> F[Context Assembly]
+    E --> F
+    F --> G[OpenRouter LLM<br>Gemini 2.0 Flash]
+    G --> H[Fact-Check Verdict<br>SUPPORTED / CONTRADICTED<br>UNVERIFIABLE + confidence score]
 ```
 
 ### Data Flow
@@ -115,7 +102,7 @@ Medical misinformation, especially in regional languages, poses a significant th
 |-------|-------------|
 | **Language** | Python 3.10+ |
 | **Data Ingestion** | HuggingFace Datasets |
-| **Embeddings** | Sentence-Transformers (all-MiniLM-L6-v2) |
+| **Embeddings** | Sentence-Transformers (BAAI/bge-m3, 1024-dim) |
 | **Vector Store** | NumPy (Local) |
 | **Graph Database** | Neo4j AuraDB (Free Tier) |
 | **LLM** | Google Gemini 2.0 Flash (via OpenRouter) |
@@ -129,38 +116,44 @@ Medical misinformation, especially in regional languages, poses a significant th
 Medical-GraphRAG-FactChecker/
 ├── .github/
 │   └── workflows/
-│       └── python-ci.yml          # CI/CD workflow
-├── docs/
-│   ├── ARCHITECTURE.md            # Detailed architecture
-│   ├── SETUP_GUIDE.md             # Setup instructions
-│   └── API_REFERENCE.md           # API documentation
+│       └── test.yml              # CI/CD workflow
+├── src/
+│   ├── __init__.py
+│   ├── config.py                   # Configuration management (pydantic-settings)
+│   ├── constants.py                # Constants and enums
+│   ├── graph.py                    # Neo4j graph queries
+│   ├── logger.py                   # Structured logging
+│   ├── search.py                   # Vector search functionality
+│   └── utils.py                    # Utility functions
 ├── scripts/
 │   ├── 01_fetch_pubmedqa.py       # Fetch PubMedQA dataset
 │   ├── 02_scrape_claims.py        # Scrape regional claims
 │   ├── 03_embed_and_index.py      # Generate embeddings
 │   ├── 04_build_knowledge_graph.py # Build Neo4j graph
 │   └── 05_fact_check_pipeline.py  # Run fact-checking
-├── src/
-│   ├── __init__.py
-│   ├── config.py                   # Configuration management
-│   ├── utils.py                    # Utility functions
-│   └── constants.py                # Constants and enums
 ├── tests/
-│   ├── test_embedding.py
-│   ├── test_kg_builder.py
-│   └── test_fact_check.py
+│   ├── test_config.py              # Config tests
+│   ├── test_utils.py               # Utils tests
+│   ├── test_search.py              # Search tests
+│   ├── test_neo4j_mock.py          # Neo4j mock tests
+│   └── test_stress.py              # Stress tests
 ├── data/
 │   ├── pubmedqa_clean.json        # Clean PubMed data
 │   ├── scraped_claims.json        # Scraped claims
-│   ├── embeddings/                 # Generated embeddings
+│   ├── golden_dataset.json        # Evaluation dataset
 │   └── fact_check_results.json    # Results output
+├── embeddings/                     # Generated embeddings
 ├── .env.example                    # Environment template
 ├── .gitignore                      # Git ignore rules
-├── LICENSE                         # Proprietary - All Rights Reserved
+├── LICENSE                         # Apache 2.0 License
 ├── README.md                       # This file
+├── CHANGELOG.md                    # Version history
+├── SECURITY.md                     # Security policy
 ├── requirements.txt                # Python dependencies
 ├── pyproject.toml                 # Project metadata
-└── CONTRIBUTING.md               # Contribution guidelines
+├── Dockerfile                     # Docker build file
+├── docker-compose.yml             # Docker Compose
+└── evaluate_rag.py                # Evaluation script
 ```
 
 ---
@@ -211,8 +204,8 @@ cp .env.example .env
 ```env
 # Neo4j AuraDB Credentials
 NEO4J_URI=neo4j+s://your-instance.databases.neo4j.io
-NEO4J_USERNAME=your_username
-NEO4J_PASSWORD=your_password
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_password_here
 
 # OpenRouter API Key (for LLM)
 OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -243,7 +236,7 @@ python scripts/01_fetch_pubmedqa.py
 
 ### Step 2: Scrape Claims
 
-Collect regional medical claims (configure URLs in the script):
+Collect regional medical claims (or use sample data):
 ```bash
 python scripts/02_scrape_claims.py
 ```
@@ -257,7 +250,7 @@ Create vector embeddings for medical literature:
 python scripts/03_embed_and_index.py
 ```
 
-**Output:** `embeddings/pubmed_embeddings.npy` (1000 × 384 matrix).
+**Output:** `embeddings/pubmed_embeddings.npy` (N × 1024 matrix).
 
 ### Step 4: Build Knowledge Graph
 
@@ -283,63 +276,39 @@ python scripts/05_fact_check_pipeline.py
 
 ---
 
-## API Configuration
+## Docker Usage
 
-### Supported LLM Models
+### Build and Start
 
-The project supports multiple LLM providers through OpenRouter:
-
-| Model | Provider | Status |
-|-------|----------|--------|
-| Gemini 2.0 Flash | Google | ✅ Recommended |
-| GPT-4o Mini | OpenAI | ✅ Supported |
-| Claude 3 Haiku | Anthropic | ✅ Supported |
-
-### Changing the Model
-
-Edit `scripts/05_fact_check_pipeline.py` to change the model:
-
-```python
-payload = {
-    'model': 'anthropic/claude-3-haiku',  # Change here
-    'messages': [{'role': 'user', 'content': prompt}],
-    ...
-}
+```bash
+docker compose up --build
 ```
+
+### Run fact-checking in Docker
+
+```bash
+docker compose exec app python scripts/05_fact_check_pipeline.py
+```
+
+### Access Neo4j Browser
+
+Open http://localhost:7474
 
 ---
 
-## Sample Results
+## Evaluation
 
-### Input Claims (Multilingual)
+This system was benchmarked against naive vector-only RAG on a curated 20-claim golden dataset.
+Full results: [benchmark_results.md](benchmark_results.md)
 
-| Language | Claim |
-|----------|-------|
-| Hindi | गर्म पानी पीने से कोरोना वायरस ठीक हो जाता है। |
-| German | Trinken von warmem Wasser heilt COVID-19. |
-| Tamil | மஞ்சள் பால் குடிப்பது புற்றுநோயை குணப்படுத்தும். |
-| English | Antibiotics are effective against viral infections. |
+| Metric | GraphRAG | Naive RAG |
+|---|---|---|
+| F1 Score (weighted) | *run evaluate_rag.py* | *run evaluate_rag.py* |
+| Accuracy | *run evaluate_rag.py* | *run evaluate_rag.py* |
 
-### Output Verdicts
-
-```json
-{
-  "claim": "हल्दी और दूध पीने से कैंसर का इलाज होता है।",
-  "original_language": "hi",
-  "verdict": "CONTRADICTED",
-  "confidence_score": 0.90,
-  "explanation": "There is no scientific evidence that drinking turmeric and milk cures cancer. While turmeric has anti-inflammatory properties, it is not a proven cancer treatment.",
-  "detected_language": "hi"
-}
-```
-
-### Results Summary
-
-```
-Total claims processed: 20
-  CONTRADICTED:   6 (30.0%)
-  UNVERIFIABLE:  14 (70.0%)
-  SUPPORTED:      0 (0.0%)
+Run evaluation:
+```bash
+python evaluate_rag.py
 ```
 
 ---
@@ -352,10 +321,10 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 
 ```bash
 # Install dev dependencies
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 
 # Run tests
-pytest tests/
+pytest tests/ -v --cov=src
 
 # Format code
 black src/ tests/
@@ -366,7 +335,7 @@ isort src/ tests/
 
 ## License
 
-This project is proprietary and confidential. All rights reserved. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -382,8 +351,8 @@ This project is proprietary and confidential. All rights reserved. See the [LICE
 
 <div align="center">
 
-**⭐ Star this repository if you found it helpful!**
+**Star this repository if you found it helpful!**
 
-*Built with ❤️ by [Sourav Kumar Sharma](https://github.com/sourav1243)*
+*Built with care by [Sourav Kumar Sharma](https://github.com/sourav1243)*
 
 </div>
