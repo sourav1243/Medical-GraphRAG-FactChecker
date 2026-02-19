@@ -10,7 +10,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Sourav Kumar Sharma", email = "sourav@example.com"}
+    {name = "Sourav Kumar Sharma", email = "sksnilshub@gmail.com"}
 ]
 keywords = ["medical", "fact-checking", "graphrag", "knowledge-graph", "neo4j", "rag", "ai", "healthcare"]
 classifiers = [
